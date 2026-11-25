@@ -7,7 +7,7 @@ Docker Hub: [`nuzkito/browsers`](https://hub.docker.com/r/nuzkito/browsers)
 
 ## Contents
 
-- Chromium (from Debian trixie).
+- Chromium (from Debian trixie), with the translations of `chromium-l10n`.
 - Firefox ESR (from Debian trixie).
 - `puppeteer-core` 25.18.1, installed globally. Scripts can `import` it
   from any directory.
@@ -110,6 +110,42 @@ await page.goto('http://127.0.0.1:8000');
 await page.screenshot({ path: 'screenshot.png' });
 await browser.close();
 ```
+
+## Change the language
+
+The default language is `en-US`. To use a different language, for example to
+show dates and numbers in the Spanish format, set the `LANG` environment
+variable:
+
+```yaml
+services:
+  browser:
+    image: nuzkito/browsers:1
+    environment:
+      LANG: es_ES.UTF-8
+```
+
+Chromium reads the language from `LANG` or `LANGUAGE` (for example,
+`LANGUAGE=es`). On Linux, Chromium ignores the `--lang` flag.
+
+Firefox also needs these preferences in `puppeteer.launch`:
+
+```js
+extraPrefsFirefox: {
+    'intl.regional_prefs.use_os_locales': true,
+    'intl.accept_languages': 'es-ES, es',
+},
+```
+
+- `intl.regional_prefs.use_os_locales` makes Firefox take the date and number
+  format from `LANG`. `LANGUAGE` has no effect on Firefox.
+- `intl.accept_languages` sets `navigator.language` and the `Accept-Language`
+  header. It is optional: add it if the app selects its language from these
+  values.
+
+The CDP command `Emulation.setLocaleOverride` changes `navigator.language` and
+`Intl`, but Chromium still shows `<input type="date">` in the browser
+language. Use `LANG` if your screenshots show these inputs.
 
 ## Run a script
 

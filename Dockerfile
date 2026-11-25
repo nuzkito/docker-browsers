@@ -3,6 +3,7 @@ FROM node:24-trixie-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         chromium \
+        chromium-l10n \
         firefox-esr \
         fonts-liberation \
         fonts-noto-color-emoji \
